@@ -84,7 +84,7 @@
     <header>
       <div>
         <h1>健康打卡｜效率优先</h1>
-        <div class="sub">目标：稳住甲状腺 / 乳腺 / 血象 / 肾结晶（最少决策成本）</div>
+        <div class="sub">目标：健康生活！</div>
       </div>
       <div class="pill"><span id="todayLabel">—</span> <span class="mono" id="streak">Streak: 0</span></div>
     </header>
@@ -96,7 +96,7 @@
         <div class="row"><label><input id="c2" type="checkbox"/>午餐有主食 + 蛋白</label><span class="meta">稳能量</span></div>
         <div class="row"><label><input id="c3" type="checkbox"/>咖啡 ≤ 1 杯（且不空腹）</label><span class="meta">稳乳腺/甲状腺</span></div>
         <div class="row"><label><input id="c4" type="checkbox"/>饮水 ≥ 2 L（分次）</label><span class="meta">防肾结晶</span></div>
-        <div class="row"><label><input id="c5" type="checkbox"/>23:30 前躺下</label><span class="meta">稳TSH</span></div>
+        <div class="row"><label><input id="c5" type="checkbox"/>00:30 前躺下</label><span class="meta">稳TSH</span></div>
 
         <div class="kpi">
           <span class="pill"><strong id="score">0/5</strong>&nbsp;完成</span>
@@ -409,5 +409,52 @@
   setUIForKey(yyyy_mm_dd(cursor));
 })();
 </script>
+  <div class="card" style="margin-top:16px">
+  <h2>🍽️ 不知道吃什么？（左右滑）</h2>
+
+  <div style="
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    padding-bottom:6px;
+  ">
+    <div class="pill" style="min-width:260px; scroll-snap-align:start">
+      <strong>今天很累</strong><br/>
+      原片燕麦 / 红薯 + 鸡蛋<br/>
+      <span class="meta">稳能量、不犯困</span>
+    </div>
+
+    <div class="pill" style="min-width:260px; scroll-snap-align:start">
+      <strong>撑一下午</strong><br/>
+      杂粮饭 + 蛋白 + 蔬菜<br/>
+      <span class="meta">下午更平稳</span>
+    </div>
+
+    <div class="pill" style="min-width:260px; scroll-snap-align:start">
+      <strong>睡晚修复</strong><br/>
+      红薯 + 蛋白 + 温热菜<br/>
+      <span class="meta">对系统温和</span>
+    </div>
+
+    <div class="pill" style="min-width:260px; scroll-snap-align:start">
+      <strong>想吃面</strong><br/>
+      荞麦面（半份）+ 蛋白<br/>
+      <span class="meta">解馋但不放大波动</span>
+    </div>
+
+    <div class="pill" style="min-width:260px; scroll-snap-align:start">
+      <strong>胃口差</strong><br/>
+      清汤 + 蛋花 / 豆腐<br/>
+      <span class="meta">避免能量塌陷</span>
+    </div>
+
+    <div class="pill" style="min-width:260px; scroll-snap-align:start">
+      <strong>外食兜底</strong><br/>
+      有主食 + 有蛋白 + 少汤<br/>
+      <span class="meta">看起来稳最重要</span>
+    </div>
+  </div>
+</div>
 </body>
 </html>
