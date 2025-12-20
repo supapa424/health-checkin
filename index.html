@@ -87,7 +87,8 @@
       -webkit-overflow-scrolling:touch;
     }
     .food-item{
-      min-width:260px;
+      min-width:66vw;   /* 一屏 ≈ 1.5 张 */
+      max-width:320px;  /* 防止大屏过宽 */
       scroll-snap-align:start;
       border:1px solid var(--line);
       background:#fff;
