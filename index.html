@@ -163,9 +163,222 @@
 </div>
 
 <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js?v=2").catch(()=>{});
-}
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const tzOffsetMin = new Date().getTimezoneOffset();
+
+  function yyyy_mm_dd(d){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const da = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${da}`;
+  }
+  function parseDate(s){
+    const [y,m,d] = s.split('-').map(Number);
+    return new Date(y, m-1, d);
+  }
+  function addDays(date, n){
+    const d = new Date(date); d.setDate(d.getDate()+n); return d;
+  }
+
+  const STORAGE_KEY = "health_checkin_v1";
+  function loadAll(){
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+    catch(e){ return {}; }
+  }
+  function saveAll(obj){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+  }
+
+  let cursor = new Date();
+  let data = loadAll();
+
+  function getDay(key){
+    return data[key] || {checks:[false,false,false,false,false], meta:{}, savedAt:null};
+  }
+
+  function computeScore(day){
+    return (day.checks || []).filter(Boolean).length;
+  }
+
+  function statusTag(score){
+    if(score >= 5) return {txt:"满分", cls:"ok"};
+    if(score >= 3) return {txt:"合格", cls:"warn"};
+    if(score >= 1) return {txt:"起步", cls:"warn"};
+    return {txt:"未打卡", cls:"bad"};
+  }
+
+  function setTag(el, tag){
+    el.className = "tag " + tag.cls;
+    el.textContent = tag.txt;
+  }
+
+  function calcStreak(all, todayKey){
+    // streak: consecutive days ending at today with score>0
+    let d = parseDate(todayKey);
+    let streak = 0;
+    while(true){
+      const k = yyyy_mm_dd(d);
+      const day = all[k];
+      if(!day) break;
+      if(computeScore(day) <= 0) break;
+      streak += 1;
+      d = addDays(d, -1);
+    }
+    return streak;
+  }
+
+  function weekStats(all, endKey){
+    // last 7 days including endKey
+    let d = parseDate(endKey);
+    let total = 0;
+    let bars = [];
+    for(let i=0;i<7;i++){
+      const k = yyyy_mm_dd(addDays(d, -6+i));
+      const sc = all[k] ? computeScore(all[k]) : 0;
+      total += sc;
+      bars.push(sc);
+    }
+    return {total, bars};
+  }
+
+  function renderSpark(bars){
+    const el = $("spark");
+    el.innerHTML = "";
+    for(let i=0;i<bars.length;i++){
+      const b = document.createElement("div");
+      b.className = "bar" + (bars[i] > 0 ? " on":"");
+      b.style.height = (10 + bars[i]*6) + "px";
+      b.title = `Day ${i+1}: ${bars[i]}/5`;
+      el.appendChild(b);
+    }
+  }
+
+  function setUIForKey(key){
+    const day = getDay(key);
+    $("todayLabel").textContent = key;
+
+    const checks = day.checks || [false,false,false,false,false];
+    ["c1","c2","c3","c4","c5"].forEach((id, idx) => { $(id).checked = !!checks[idx]; });
+
+    const meta = day.meta || {};
+    $("carbType").value = meta.carbType || "";
+    $("postMeal").value = meta.postMeal || "";
+    $("seaweed").value = meta.seaweed || "";
+    $("water").value = meta.water ?? "";
+    $("bedtime").value = meta.bedtime || "";
+    $("coffee").value = meta.coffee ?? "";
+    $("note").value = meta.note || "";
+
+    const score = computeScore(day);
+    $("score").textContent = `${score}/5`;
+    setTag($("statusTag"), statusTag(score));
+
+    const st = calcStreak(data, yyyy_mm_dd(new Date()));
+    $("streak").textContent = `Streak: ${st}`;
+
+    const wk = weekStats(data, key);
+    $("weekScore").textContent = `${wk.total}/35`;
+    renderSpark(wk.bars);
+  }
+
+  function collectDayFromUI(){
+    return {
+      checks: [
+        $("c1").checked, $("c2").checked, $("c3").checked, $("c4").checked, $("c5").checked
+      ],
+      meta: {
+        carbType: $("carbType").value,
+        postMeal: $("postMeal").value,
+        seaweed: $("seaweed").value,
+        water: $("water").value ? Number($("water").value) : null,
+        bedtime: $("bedtime").value,
+        coffee: $("coffee").value ? Number($("coffee").value) : null,
+        note: $("note").value
+      },
+      savedAt: new Date().toISOString()
+    };
+  }
+
+  function saveCurrent(){
+    const key = yyyy_mm_dd(cursor);
+    data[key] = collectDayFromUI();
+    saveAll(data);
+    setUIForKey(key);
+    toast("已保存 ✅");
+  }
+
+  function toast(msg){
+    const t = document.createElement("div");
+    t.textContent = msg;
+    t.style.position="fixed";
+    t.style.left="50%";
+    t.style.bottom="24px";
+    t.style.transform="translateX(-50%)";
+    t.style.padding="10px 12px";
+    t.style.border="1px solid var(--line)";
+    t.style.borderRadius="14px";
+    t.style.background="#fff";
+    t.style.boxShadow="0 6px 18px rgba(0,0,0,.08)";
+    t.style.zIndex=9999;
+    document.body.appendChild(t);
+    setTimeout(()=>t.remove(), 1400);
+  }
+
+  // Navigation
+  $("saveBtn").addEventListener("click", saveCurrent);
+  $("prevBtn").addEventListener("click", () => { cursor = addDays(cursor, -1); setUIForKey(yyyy_mm_dd(cursor)); });
+  $("nextBtn").addEventListener("click", () => { cursor = addDays(cursor,  1); setUIForKey(yyyy_mm_dd(cursor)); });
+  $("todayBtn").addEventListener("click", () => { cursor = new Date(); setUIForKey(yyyy_mm_dd(cursor)); });
+
+  // Export
+  $("exportBtn").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "health-checkin-data.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  // Import
+  $("importBtn").addEventListener("click", () => $("fileInput").click());
+  $("fileInput").addEventListener("change", async (e) => {
+    const f = e.target.files[0];
+    if(!f) return;
+    try{
+      const txt = await f.text();
+      const obj = JSON.parse(txt);
+      if(typeof obj !== "object" || Array.isArray(obj)) throw new Error("格式不对");
+      data = obj;
+      saveAll(data);
+      setUIForKey(yyyy_mm_dd(cursor));
+      toast("已导入 ✅");
+    }catch(err){
+      alert("导入失败：" + err.message);
+    }finally{
+      e.target.value = "";
+    }
+  });
+
+  // Reset
+  $("resetBtn").addEventListener("click", () => {
+    if(confirm("确定清空本机所有打卡数据吗？此操作不可撤销。")){
+      data = {};
+      saveAll(data);
+      setUIForKey(yyyy_mm_dd(cursor));
+      toast("已清空");
+    }
+  });
+
+  // PWA install
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js?v=2").catch(()=>{});
+  }
+
+  // Init
+  setUIForKey(yyyy_mm_dd(cursor));
+})();
 </script>
 
 </body>
