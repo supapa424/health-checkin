@@ -7,6 +7,7 @@
   <title>健康打卡｜效率优先</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png" />
+
   <style>
     :root{
       --bg:#ffffff; --fg:#111827; --muted:#6b7280; --line:#e5e7eb;
@@ -15,15 +16,17 @@
     }
     *{box-sizing:border-box}
     body{
-      margin:0; font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-      color:var(--fg); background:linear-gradient(180deg,#fff,#fbfbfb);
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      color:var(--fg);
+      background:linear-gradient(180deg,#fff,#fbfbfb);
     }
     .wrap{max-width:860px; margin:0 auto; padding:20px 16px 40px}
     header{
       display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
       padding:10px 2px 6px;
     }
-    h1{font-size:22px; margin:0; letter-spacing:0.2px}
+    h1{font-size:22px; margin:0}
     .sub{font-size:12px; color:var(--muted)}
     .pill{
       display:inline-flex; align-items:center; gap:8px;
@@ -32,492 +35,138 @@
     }
     .grid{display:grid; grid-template-columns:1.1fr 0.9fr; gap:12px; margin-top:12px}
     @media (max-width:860px){ .grid{grid-template-columns:1fr} }
+
     .card{
-      background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
-      padding:14px; box-shadow:0 1px 0 rgba(17,24,39,.03);
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:14px;
+      box-shadow:0 1px 0 rgba(17,24,39,.03);
     }
     .card h2{margin:0 0 10px; font-size:16px}
-    .row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 8px; border-radius:14px}
-    .row + .row{margin-top:6px}
-    .row label{display:flex; gap:10px; align-items:center; font-size:14px}
-    input[type="checkbox"]{width:20px; height:20px}
-    .meta{font-size:12px; color:var(--muted)}
-    .kpi{
-      display:flex; flex-wrap:wrap; gap:8px; margin-top:8px
+
+    .row{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding:10px 8px;
+      border-radius:14px;
     }
-    .kpi .pill strong{font-size:12px}
-    .btns{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+    .row + .row{margin-top:6px}
+
+    .meta{font-size:12px; color:var(--muted)}
+
     button{
-      border:1px solid var(--line); background:#fff; padding:10px 12px; border-radius:14px;
-      font-size:13px; cursor:pointer;
+      border:1px solid var(--line);
+      background:#fff;
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:13px;
+      cursor:pointer;
     }
     button.primary{background:#111827; color:#fff; border-color:#111827}
-    button.danger{border-color:#fecaca; background:#fff5f5; color:#991b1b}
-    .small{font-size:12px; color:var(--muted)}
-    select, input[type="time"], input[type="number"], textarea{
-      width:100%; border:1px solid var(--line); border-radius:14px; padding:10px 12px; background:#fff;
-      font-size:14px;
+
+    .btns{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+
+    .food-scroll{
+      display:flex;
+      gap:12px;
+      overflow-x:auto;
+      scroll-snap-type:x mandatory;
+      padding-bottom:6px;
     }
-    textarea{min-height:92px; resize:vertical}
-    .two{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-    @media (max-width:520px){ .two{grid-template-columns:1fr} }
-    .tag{
-      display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; font-size:12px;
-      border:1px solid var(--line); background:#fff;
+
+    .food-item{
+      min-width:260px;
+      scroll-snap-align:start;
+      flex-direction:column;
+      align-items:flex-start;
+      justify-content:space-between;
+      border:1px solid var(--line);
+      background:#fff;
     }
-    .tag.ok{border-color:#bbf7d0; background:#f0fdf4; color:#166534}
-    .tag.warn{border-color:#fde68a; background:#fffbeb; color:#92400e}
-    .tag.bad{border-color:#fecaca; background:#fff1f2; color:#9f1239}
-    .hr{height:1px; background:var(--line); margin:10px 0}
-    .list{margin:0; padding-left:18px; color:var(--muted); font-size:13px}
-    .spark{
-      display:flex; gap:4px; align-items:flex-end; height:44px; margin-top:8px
-    }
-    .bar{width:10px; border-radius:6px; background:#e5e7eb}
-    .bar.on{background:#111827}
-    .footer{margin-top:14px; text-align:center; color:var(--muted); font-size:12px}
-    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <header>
-      <div>
-        <h1>健康打卡｜效率优先</h1>
-        <div class="sub">目标：健康生活！</div>
-      </div>
-      <div class="pill"><span id="todayLabel">—</span> <span class="mono" id="streak">Streak: 0</span></div>
-    </header>
+<div class="wrap">
 
-    <div class="grid">
-      <section class="card">
-        <h2>今日执行清单（5 项）</h2>
-        <div class="row"><label><input id="c1" type="checkbox"/>吃了早餐（含蛋白）</label><span class="meta">防空腹快糖</span></div>
-        <div class="row"><label><input id="c2" type="checkbox"/>午餐有主食 + 蛋白</label><span class="meta">稳能量</span></div>
-        <div class="row"><label><input id="c3" type="checkbox"/>咖啡 ≤ 1 杯（且不空腹）</label><span class="meta">稳乳腺/甲状腺</span></div>
-        <div class="row"><label><input id="c4" type="checkbox"/>饮水 ≥ 2 L（分次）</label><span class="meta">防肾结晶</span></div>
-        <div class="row"><label><input id="c5" type="checkbox"/>00:30 前躺下</label><span class="meta">稳TSH</span></div>
-
-        <div class="kpi">
-          <span class="pill"><strong id="score">0/5</strong>&nbsp;完成</span>
-          <span class="pill">状态：<span id="statusTag" class="tag">—</span></span>
-          <span class="pill">近 7 天：<span id="weekScore" class="mono">—</span></span>
-        </div>
-
-        <div class="spark" id="spark"></div>
-
-        <div class="btns">
-          <button class="primary" id="saveBtn">保存今日</button>
-          <button id="prevBtn">← 昨天</button>
-          <button id="nextBtn">明天 →</button>
-          <button id="todayBtn">回到今天</button>
-        </div>
-        <div class="small">提示：记得点击保存哦。</div>
-      </section>
-
-      <aside class="card">
-        <h2>稳能量记录（可选，但很有用）</h2>
-        <div class="two">
-          <div>
-            <div class="meta">今日主食类型</div>
-            <select id="carbType">
-              <option value="">（未记录）</option>
-              <option value="slow">慢碳水（杂粮饭/红薯/原片燕麦/玉米）</option>
-              <option value="mixed">混合（少量白米/面 + 蛋白蔬菜）</option>
-              <option value="fast">快碳水（白米/白面/甜点）</option>
-            </select>
-          </div>
-          <div>
-            <div class="meta">餐后状态</div>
-            <select id="postMeal">
-              <option value="">（未记录）</option>
-              <option value="good">精力平稳</option>
-              <option value="sleepy">犯困</option>
-              <option value="unwell">难受/心慌</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="margin-top:10px" class="two">
-
-          <div>
-            <div class="meta">饮水（L）</div>
-            <input id="water" type="number" inputmode="decimal" min="0" max="5" step="0.1" placeholder="例如 2.0" />
-          </div>
-        </div>
-
-        <div style="margin-top:10px" class="two">
-          <div>
-            <div class="meta">上床时间</div>
-            <input id="bedtime" type="time" />
-          </div>
-          <div>
-            <div class="meta">咖啡杯数</div>
-            <input id="coffee" type="number" min="0" max="6" step="1" placeholder="例如 1" />
-          </div>
-        </div>
-
-        <div style="margin-top:10px">
-          <div class="meta">备注（可写“今日触发点/经前/压力/运动”）</div>
-          <textarea id="note" placeholder="例如：午餐吃了面，30分钟后犯困；今天走路20分钟"></textarea>
-        </div>
-
-        <div class="hr"></div>
-        <h2>你的关键规则（固定）</h2>
-        <ul class="list">
-          <li>主食优先选：杂粮饭(1:1)、红薯/紫薯、原片燕麦、玉米。</li>
-          <li>白米/白面：可以吃，但“减半 + 先吃蛋白蔬菜”。</li>
-          <li>海带：≤1次/周、少量、不连续；不叠加紫菜/碘片。</li>
-          <li>每天：饮水 ≥2L；不憋尿。</li>
-          <li>睡眠：固定起床；23:30 前躺下优先级最高。</li>
-        </ul>
-
-        <div class="btns" style="margin-top:12px">
-          <button id="exportBtn">导出数据(JSON)</button>
-          <button id="importBtn">导入数据(JSON)</button>
-          <button class="danger" id="resetBtn">清空本机数据</button>
-        </div>
-        <input id="fileInput" type="file" accept="application/json" style="display:none"/>
-        <div class="footer">本工具仅用于自我管理，不替代医生诊断。</div>
-      </aside>
-    </div>
+<header>
+  <div>
+    <h1>健康打卡｜效率优先</h1>
+    <div class="sub">目标：稳能量、少波动、长期可执行</div>
   </div>
+  <div class="pill"><span id="todayLabel">—</span></div>
+</header>
 
-<script>
-(() => {
-  const $ = (id) => document.getElementById(id);
-  const tzOffsetMin = new Date().getTimezoneOffset();
+<div class="grid">
 
-  function yyyy_mm_dd(d){
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,'0');
-    const da = String(d.getDate()).padStart(2,'0');
-    return `${y}-${m}-${da}`;
-  }
-  function parseDate(s){
-    const [y,m,d] = s.split('-').map(Number);
-    return new Date(y, m-1, d);
-  }
-  function addDays(date, n){
-    const d = new Date(date); d.setDate(d.getDate()+n); return d;
-  }
+<section class="card">
+  <h2>今日执行清单</h2>
 
-  const STORAGE_KEY = "health_checkin_v1";
-  function loadAll(){
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
-    catch(e){ return {}; }
-  }
-  function saveAll(obj){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
-  }
+  <div class="row"><input type="checkbox"/> 吃了早餐（含蛋白）</div>
+  <div class="row"><input type="checkbox"/> 午餐有主食 + 蛋白</div>
+  <div class="row"><input type="checkbox"/> 咖啡 ≤ 1 杯（不空腹）</div>
+  <div class="row"><input type="checkbox"/> 饮水 ≥ 2 L</div>
+  <div class="row"><input type="checkbox"/> 00:30 前躺下</div>
 
-  let cursor = new Date();
-  let data = loadAll();
+  <div class="btns">
+    <button class="primary">保存今日</button>
+  </div>
+</section>
 
-  function getDay(key){
-    return data[key] || {checks:[false,false,false,false,false], meta:{}, savedAt:null};
-  }
-
-  function computeScore(day){
-    return (day.checks || []).filter(Boolean).length;
-  }
-
-  function statusTag(score){
-    if(score >= 5) return {txt:"满分", cls:"ok"};
-    if(score >= 3) return {txt:"合格", cls:"warn"};
-    if(score >= 1) return {txt:"起步", cls:"warn"};
-    return {txt:"未打卡", cls:"bad"};
-  }
-
-  function setTag(el, tag){
-    el.className = "tag " + tag.cls;
-    el.textContent = tag.txt;
-  }
-
-  function calcStreak(all, todayKey){
-    // streak: consecutive days ending at today with score>0
-    let d = parseDate(todayKey);
-    let streak = 0;
-    while(true){
-      const k = yyyy_mm_dd(d);
-      const day = all[k];
-      if(!day) break;
-      if(computeScore(day) <= 0) break;
-      streak += 1;
-      d = addDays(d, -1);
-    }
-    return streak;
-  }
-
-  function weekStats(all, endKey){
-    // last 7 days including endKey
-    let d = parseDate(endKey);
-    let total = 0;
-    let bars = [];
-    for(let i=0;i<7;i++){
-      const k = yyyy_mm_dd(addDays(d, -6+i));
-      const sc = all[k] ? computeScore(all[k]) : 0;
-      total += sc;
-      bars.push(sc);
-    }
-    return {total, bars};
-  }
-
-  function renderSpark(bars){
-    const el = $("spark");
-    el.innerHTML = "";
-    for(let i=0;i<bars.length;i++){
-      const b = document.createElement("div");
-      b.className = "bar" + (bars[i] > 0 ? " on":"");
-      b.style.height = (10 + bars[i]*6) + "px";
-      b.title = `Day ${i+1}: ${bars[i]}/5`;
-      el.appendChild(b);
-    }
-  }
-
-  function setUIForKey(key){
-    const day = getDay(key);
-    $("todayLabel").textContent = key;
-
-    const checks = day.checks || [false,false,false,false,false];
-    ["c1","c2","c3","c4","c5"].forEach((id, idx) => { $(id).checked = !!checks[idx]; });
-
-    const meta = day.meta || {};
-    $("carbType").value = meta.carbType || "";
-    $("postMeal").value = meta.postMeal || "";
-    $("seaweed").value = meta.seaweed || "";
-    $("water").value = meta.water ?? "";
-    $("bedtime").value = meta.bedtime || "";
-    $("coffee").value = meta.coffee ?? "";
-    $("note").value = meta.note || "";
-
-    const score = computeScore(day);
-    $("score").textContent = `${score}/5`;
-    setTag($("statusTag"), statusTag(score));
-
-    const st = calcStreak(data, yyyy_mm_dd(new Date()));
-    $("streak").textContent = `Streak: ${st}`;
-
-    const wk = weekStats(data, key);
-    $("weekScore").textContent = `${wk.total}/35`;
-    renderSpark(wk.bars);
-  }
-
-  function collectDayFromUI(){
-    return {
-      checks: [
-        $("c1").checked, $("c2").checked, $("c3").checked, $("c4").checked, $("c5").checked
-      ],
-      meta: {
-        carbType: $("carbType").value,
-        postMeal: $("postMeal").value,
-        seaweed: $("seaweed").value,
-        water: $("water").value ? Number($("water").value) : null,
-        bedtime: $("bedtime").value,
-        coffee: $("coffee").value ? Number($("coffee").value) : null,
-        note: $("note").value
-      },
-      savedAt: new Date().toISOString()
-    };
-  }
-
-  function saveCurrent(){
-    const key = yyyy_mm_dd(cursor);
-    data[key] = collectDayFromUI();
-    saveAll(data);
-    setUIForKey(key);
-    toast("已保存 ✅");
-  }
-
-  function toast(msg){
-    const t = document.createElement("div");
-    t.textContent = msg;
-    t.style.position="fixed";
-    t.style.left="50%";
-    t.style.bottom="24px";
-    t.style.transform="translateX(-50%)";
-    t.style.padding="10px 12px";
-    t.style.border="1px solid var(--line)";
-    t.style.borderRadius="14px";
-    t.style.background="#fff";
-    t.style.boxShadow="0 6px 18px rgba(0,0,0,.08)";
-    t.style.zIndex=9999;
-    document.body.appendChild(t);
-    setTimeout(()=>t.remove(), 1400);
-  }
-
-  // Navigation
-  $("saveBtn").addEventListener("click", saveCurrent);
-  $("prevBtn").addEventListener("click", () => { cursor = addDays(cursor, -1); setUIForKey(yyyy_mm_dd(cursor)); });
-  $("nextBtn").addEventListener("click", () => { cursor = addDays(cursor,  1); setUIForKey(yyyy_mm_dd(cursor)); });
-  $("todayBtn").addEventListener("click", () => { cursor = new Date(); setUIForKey(yyyy_mm_dd(cursor)); });
-
-  // Export
-  $("exportBtn").addEventListener("click", () => {
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "health-checkin-data.json";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  });
-
-  // Import
-  $("importBtn").addEventListener("click", () => $("fileInput").click());
-  $("fileInput").addEventListener("change", async (e) => {
-    const f = e.target.files[0];
-    if(!f) return;
-    try{
-      const txt = await f.text();
-      const obj = JSON.parse(txt);
-      if(typeof obj !== "object" || Array.isArray(obj)) throw new Error("格式不对");
-      data = obj;
-      saveAll(data);
-      setUIForKey(yyyy_mm_dd(cursor));
-      toast("已导入 ✅");
-    }catch(err){
-      alert("导入失败：" + err.message);
-    }finally{
-      e.target.value = "";
-    }
-  });
-
-  // Reset
-  $("resetBtn").addEventListener("click", () => {
-    if(confirm("确定清空本机所有打卡数据吗？此操作不可撤销。")){
-      data = {};
-      saveAll(data);
-      setUIForKey(yyyy_mm_dd(cursor));
-      toast("已清空");
-    }
-  });
-
-  // PWA install
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=2").catch(()=>{});
-  }
-
-  // Init
-  setUIForKey(yyyy_mm_dd(cursor));
-})();
-</script>
-  
-<div class="card" style="margin-top:16px">
+<aside class="card">
   <h2>🍽️ 不知道吃什么？（左右滑）</h2>
 
-  <div style="
-    display:flex;
-    gap:12px;
-    overflow-x:auto;
-    scroll-snap-type:x mandatory;
-    padding-bottom:6px;
-  ">
+  <div class="food-scroll">
 
-    <!-- 卡片 1 -->
-    <div style="
-      min-width:260px;
-      padding:12px 14px;
-      border:1px solid #e5e7eb;
-      border-radius:14px;
-      background:#fff;
-      scroll-snap-align:start;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-    ">
-      <div style="font-weight:600;">今天很累</div>
+    <div class="row food-item">
+      <strong>今天很累</strong>
       <div>原片燕麦 / 红薯 + 鸡蛋</div>
-      <div style="font-size:12px; color:#6b7280;">稳能量、不犯困</div>
+      <div class="meta">稳能量，不犯困</div>
     </div>
 
-    <!-- 卡片 2 -->
-    <div style="
-      min-width:260px;
-      padding:12px 14px;
-      border:1px solid #e5e7eb;
-      border-radius:14px;
-      background:#fff;
-      scroll-snap-align:start;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-    ">
-      <div style="font-weight:600;">撑一下午</div>
+    <div class="row food-item">
+      <strong>撑一下午</strong>
       <div>杂粮饭 + 蛋白 + 蔬菜</div>
-      <div style="font-size:12px; color:#6b7280;">下午更平稳</div>
+      <div class="meta">下午更平稳</div>
     </div>
 
-    <!-- 卡片 3 -->
-    <div style="
-      min-width:260px;
-      padding:12px 14px;
-      border:1px solid #e5e7eb;
-      border-radius:14px;
-      background:#fff;
-      scroll-snap-align:start;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-    ">
-      <div style="font-weight:600;">睡晚修复</div>
+    <div class="row food-item">
+      <strong>睡晚修复</strong>
       <div>红薯 + 蛋白 + 温热菜</div>
-      <div style="font-size:12px; color:#6b7280;">对系统温和</div>
+      <div class="meta">对系统温和</div>
     </div>
 
-    <!-- 卡片 4 -->
-    <div style="
-      min-width:260px;
-      padding:12px 14px;
-      border:1px solid #e5e7eb;
-      border-radius:14px;
-      background:#fff;
-      scroll-snap-align:start;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-    ">
-      <div style="font-weight:600;">想吃面</div>
-      <div>荞麦面（半份）+ 蛋白 + 多菜</div>
-      <div style="font-size:12px; color:#6b7280;">解馋但不放大波动</div>
+    <div class="row food-item">
+      <strong>想吃面</strong>
+      <div>荞麦面（半份）+ 蛋白</div>
+      <div class="meta">解馋但不放大波动</div>
     </div>
 
-    <!-- 卡片 5 -->
-    <div style="
-      min-width:260px;
-      padding:12px 14px;
-      border:1px solid #e5e7eb;
-      border-radius:14px;
-      background:#fff;
-      scroll-snap-align:start;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-    ">
-      <div style="font-weight:600;">胃口差</div>
-      <div>清汤 + 蛋花 / 豆腐 + 少量主食</div>
-      <div style="font-size:12px; color:#6b7280;">避免能量塌陷</div>
+    <div class="row food-item">
+      <strong>胃口差</strong>
+      <div>清汤 + 蛋花 / 豆腐</div>
+      <div class="meta">避免能量塌陷</div>
     </div>
 
-    <!-- 卡片 6 -->
-    <div style="
-      min-width:260px;
-      padding:12px 14px;
-      border:1px solid #e5e7eb;
-      border-radius:14px;
-      background:#fff;
-      scroll-snap-align:start;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-    ">
-      <div style="font-weight:600;">外食兜底</div>
-      <div>有主食（少量）+ 有蛋白 + 少汤少甜</div>
-      <div style="font-size:12px; color:#6b7280;">看起来稳最重要</div>
+    <div class="row food-item">
+      <strong>外食兜底</strong>
+      <div>有主食 + 有蛋白 + 少汤</div>
+      <div class="meta">看起来稳最重要</div>
     </div>
 
   </div>
+</aside>
+
+</div>
 </div>
 
-  
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js?v=2").catch(()=>{});
+}
+</script>
+
 </body>
 </html>
