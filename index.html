@@ -36,6 +36,9 @@
       background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
       padding:14px; box-shadow:0 1px 0 rgba(17,24,39,.03);
     }
+
+    .card{ min-width:0; }/* ✅ 保险 */
+    
     .card h2{margin:0 0 10px; font-size:16px}
     .row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 8px; border-radius:14px}
     .row + .row{margin-top:6px}
@@ -82,20 +85,27 @@
   display:flex;
   gap:12px;
 
+  /* ✅ 关键：强行限制滚动容器不超过父级 */
   width:100%;
   max-width:100%;
+  min-width:0;
 
   overflow-x:auto;
   overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
   scroll-snap-type:x mandatory;
+
   padding-bottom:6px;
 
-  -webkit-overflow-scrolling:touch;
+  /* ✅ iOS 上减少“把页面也撑宽”的概率 */
+  overscroll-behavior-x: contain;
 }
 
 .food-item{
-  flex:0 0 66vw;        /* ✅ 一屏 ≈ 1.5 张（替代 min-width，避免撑破外层） */
+  /* ✅ 关键：用 flex-basis 取代 min-width（iOS 更稳，不会把外层撑开） */
+  flex:0 0 66vw;      /* 一屏 ≈ 1.5 张 */
   max-width:320px;
+  min-width:0;
   box-sizing:border-box;
 
   scroll-snap-align:start;
@@ -110,6 +120,10 @@
   gap:6px;
 }
 
+html, body{
+  overflow-x:hidden;
+}/* ✅ 最后一层兜底保险 */
+    
   </style>
 </head>
 <body>
@@ -117,7 +131,7 @@
     <header>
       <div>
         <h1>健康打卡｜效率优先</h1>
-        <div class="sub">目标：健康生活，不要有慢性病！ v24 </div>
+        <div class="sub">目标：健康生活，不要有慢性病！ v25 </div>
       </div>
       <div class="pill"><span id="todayLabel">—</span> <span class="mono" id="streak">Streak: 0</span></div>
     </header>
