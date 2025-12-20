@@ -78,27 +78,37 @@
     .footer{margin-top:14px; text-align:center; color:var(--muted); font-size:12px}
     .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
   
-    .food-scroll{
-      display:flex;
-      gap:12px;
-      overflow-x:auto;
-      scroll-snap-type:x mandatory;
-      padding-bottom:6px;
-      -webkit-overflow-scrolling:touch;
-    }
-    .food-item{
-      min-width:66vw;   /* 一屏 ≈ 1.5 张 */
-      max-width:320px;  /* 防止大屏过宽 */
-      scroll-snap-align:start;
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:14px;
-      padding:12px 14px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      gap:6px;
-    }
+.food-scroll{
+  display:flex;
+  gap:12px;
+
+  width:100%;
+  max-width:100%;
+
+  overflow-x:auto;
+  overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  padding-bottom:6px;
+
+  -webkit-overflow-scrolling:touch;
+}
+
+.food-item{
+  flex:0 0 66vw;        /* ✅ 一屏 ≈ 1.5 张（替代 min-width，避免撑破外层） */
+  max-width:320px;
+  box-sizing:border-box;
+
+  scroll-snap-align:start;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:14px;
+  padding:12px 14px;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:6px;
+}
 
   </style>
 </head>
@@ -107,7 +117,7 @@
     <header>
       <div>
         <h1>健康打卡｜效率优先</h1>
-        <div class="sub">目标：健康生活，不要有慢性病！ v2 </div>
+        <div class="sub">目标：健康生活，不要有慢性病！ v24 </div>
       </div>
       <div class="pill"><span id="todayLabel">—</span> <span class="mono" id="streak">Streak: 0</span></div>
     </header>
