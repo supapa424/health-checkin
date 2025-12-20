@@ -1,4 +1,4 @@
-const CACHE = "health-checkin-v5";
+const CACHE = "health-checkin-v6";
 const ASSETS = [
   "./",
   "./index.html",
