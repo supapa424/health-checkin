@@ -1,4 +1,4 @@
-const CACHE = "health-checkin-v24"; // ← 每次发布只改这里的版本号
+const CACHE = "health-checkin-v25"; // ← 每次发布只改这里的版本号
 
 const ASSETS = [
   "./",
